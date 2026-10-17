@@ -9,6 +9,7 @@ jobs:
     environment: Build
     permissions:
       contents: write
+      packages: read
     steps:
       - uses: actions/checkout@v4
         with:
@@ -72,36 +73,36 @@ jobs:
         run: chmod +x ./gradlew
       - name: Data Generation (NeoForge)
         env:
-          GPR_USER: "MrCrayfish"
-          GPR_KEY: ${{ secrets.GPR_TOKEN }}
+          GPR_USER: ${{ github.actor }}
+          GPR_KEY: ${{ secrets.GITHUB_TOKEN }}
           PACKAGES_REPO: ${{ vars.PACKAGES_REPOSITORY }}
           TARGET_LOADER: "neoforge"
         run: ./gradlew :neoforge:runData
       - name: Data Generation (Fabric)
         env:
-          GPR_USER: "MrCrayfish"
-          GPR_KEY: ${{ secrets.GPR_TOKEN }}
+          GPR_USER: ${{ github.actor }}
+          GPR_KEY: ${{ secrets.GITHUB_TOKEN }}
           PACKAGES_REPO: ${{ vars.PACKAGES_REPOSITORY }}
           TARGET_LOADER: "fabric"
         run: ./gradlew :fabric:runDatagen
       - name: Build (Common)
         env:
-          GPR_USER: "MrCrayfish"
-          GPR_KEY: ${{ secrets.GPR_TOKEN }}
+          GPR_USER: ${{ github.actor }}
+          GPR_KEY: ${{ secrets.GITHUB_TOKEN }}
           PACKAGES_REPO: ${{ vars.PACKAGES_REPOSITORY }}
           TARGET_LOADER: "common"
         run: ./gradlew :common:build
       - name: Build (Fabric)
         env:
-          GPR_USER: "MrCrayfish"
-          GPR_KEY: ${{ secrets.GPR_TOKEN }}
+          GPR_USER: ${{ github.actor }}
+          GPR_KEY: ${{ secrets.GITHUB_TOKEN }}
           PACKAGES_REPO: ${{ vars.PACKAGES_REPOSITORY }}
           TARGET_LOADER: "fabric"
         run: ./gradlew :fabric:build
       - name: Build (NeoForge)
         env:
-          GPR_USER: "MrCrayfish"
-          GPR_KEY: ${{ secrets.GPR_TOKEN }}
+          GPR_USER: ${{ github.actor }}
+          GPR_KEY: ${{ secrets.GITHUB_TOKEN }}
           PACKAGES_REPO: ${{ vars.PACKAGES_REPOSITORY }}
           TARGET_LOADER: "neoforge"
         run: ./gradlew :neoforge:build
