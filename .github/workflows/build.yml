@@ -1,4 +1,4 @@
-Name: Build Backpacked
+name: Build Backpacked
 on:
   push:
     tags:
