@@ -133,9 +133,11 @@ jobs:
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
+          allowUpdates: true
           name: '${{ steps.mod_data.outputs.mod_version }}+${{ steps.mod_data.outputs.minecraft_version }}'
           artifacts: "${{ steps.artifacts.outputs.fabric }},${{ steps.artifacts.outputs.neoforge }},CHANGELOG.txt"
           bodyFile: "RELEASE_BODY.md"
+
       - name: Prepare Artifacts
         run: |
           mkdir artifacts
