@@ -6,7 +6,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: Build
     permissions:
       contents: write
       packages: read
@@ -75,35 +74,35 @@ jobs:
         env:
           GPR_USER: ${{ github.actor }}
           GPR_KEY: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGES_REPO: ${{ vars.PACKAGES_REPOSITORY }}
+          PACKAGES_REPO: "https://maven.pkg.github.com/MrCrayfish/Maven"
           TARGET_LOADER: "neoforge"
         run: ./gradlew :neoforge:runData
       - name: Data Generation (Fabric)
         env:
           GPR_USER: ${{ github.actor }}
           GPR_KEY: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGES_REPO: ${{ vars.PACKAGES_REPOSITORY }}
+          PACKAGES_REPO: "https://maven.pkg.github.com/MrCrayfish/Maven"
           TARGET_LOADER: "fabric"
         run: ./gradlew :fabric:runDatagen
       - name: Build (Common)
         env:
           GPR_USER: ${{ github.actor }}
           GPR_KEY: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGES_REPO: ${{ vars.PACKAGES_REPOSITORY }}
+          PACKAGES_REPO: "https://maven.pkg.github.com/MrCrayfish/Maven"
           TARGET_LOADER: "common"
         run: ./gradlew :common:build
       - name: Build (Fabric)
         env:
           GPR_USER: ${{ github.actor }}
           GPR_KEY: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGES_REPO: ${{ vars.PACKAGES_REPOSITORY }}
+          PACKAGES_REPO: "https://maven.pkg.github.com/MrCrayfish/Maven"
           TARGET_LOADER: "fabric"
         run: ./gradlew :fabric:build
       - name: Build (NeoForge)
         env:
           GPR_USER: ${{ github.actor }}
           GPR_KEY: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGES_REPO: ${{ vars.PACKAGES_REPOSITORY }}
+          PACKAGES_REPO: "https://maven.pkg.github.com/MrCrayfish/Maven"
           TARGET_LOADER: "neoforge"
         run: ./gradlew :neoforge:build
       - name: Construct artifact files
@@ -145,9 +144,9 @@ jobs:
           gpg --batch --yes --passphrase "${{ env.SIGNING_PASSPHRASE }}" --armor --detach-sign ${{ steps.artifacts.outputs.neoforge }}
       - name: Publish to GitHub Packages
         env:
-          GPR_USER: "MrCrayfish"
-          GPR_KEY: ${{ secrets.GPR_TOKEN }}
-          PACKAGES_REPO: ${{ vars.PACKAGES_REPOSITORY }}
+          GPR_USER: ${{ github.actor }}
+          GPR_KEY: ${{ secrets.GITHUB_TOKEN }}
+          PACKAGES_REPO: "https://maven.pkg.github.com/MrCrayfish/Maven"
           SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
           SIGNING_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: ./gradlew publish
