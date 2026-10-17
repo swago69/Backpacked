@@ -108,8 +108,10 @@ jobs:
       - name: Construct artifact files
         id: artifacts
         run: |
-          echo "fabric=fabric/build/libs/${{ steps.mod_data.outputs.mod_id }}-fabric-${{ steps.mod_data.outputs.mod_version }}+${{ steps.mod_data.outputs.minecraft_version }}-signed.jar" >> "$GITHUB_OUTPUT"
-          echo "neoforge=neoforge/build/libs/${{ steps.mod_data.outputs.mod_id }}-neoforge-${{ steps.mod_data.outputs.mod_version }}+${{ steps.mod_data.outputs.minecraft_version }}-signed.jar" >> "$GITHUB_OUTPUT"
+          fabric_file=$(ls fabric/build/libs/${{ steps.mod_data.outputs.mod_id }}-fabric-${{ steps.mod_data.outputs.mod_version }}+${{ steps.mod_data.outputs.minecraft_version }}*.jar | head -n 1)
+          neoforge_file=$(ls neoforge/build/libs/${{ steps.mod_data.outputs.mod_id }}-neoforge-${{ steps.mod_data.outputs.mod_version }}+${{ steps.mod_data.outputs.minecraft_version }}*.jar | head -n 1)
+          echo "fabric=$fabric_file" >> "$GITHUB_OUTPUT"
+          echo "neoforge=$neoforge_file" >> "$GITHUB_OUTPUT"
       - name: Create Changelog Files
         run: |
           echo "" > CHANGELOG.txt
@@ -126,45 +128,19 @@ jobs:
           echo "### Download:" >> RELEASE_BODY.md
           echo "- Official Website: https://mrcrayfish.com/mods/${{ steps.mod_data.outputs.mod_id }}" >> RELEASE_BODY.md
           echo "- CurseForge: https://curseforge.com/minecraft/mc-mods/backpacked" >> RELEASE_BODY.md
-      - name: Import GPG
-        env:
-          SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
-          SIGNING_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        if: ${{ env.SIGNING_KEY != '' && env.SIGNING_PASSPHRASE != '' }}
-        uses: crazy-max/ghaction-import-gpg@v6.2.0
-        with:
-          gpg_private_key: ${{ env.SIGNING_KEY }}
-          passphrase: ${{ env.SIGNING_PASSPHRASE }}
-      - name: GPG Sign
-        env:
-          SIGNING_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        if: ${{ env.SIGNING_PASSPHRASE != '' }}
-        run: |
-          gpg --batch --yes --passphrase "${{ env.SIGNING_PASSPHRASE }}" --armor --detach-sign ${{ steps.artifacts.outputs.fabric }}
-          gpg --batch --yes --passphrase "${{ env.SIGNING_PASSPHRASE }}" --armor --detach-sign ${{ steps.artifacts.outputs.neoforge }}
-      - name: Publish to GitHub Packages
-        env:
-          GPR_USER: ${{ github.actor }}
-          GPR_KEY: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGES_REPO: "https://maven.pkg.github.com/MrCrayfish/Maven"
-          SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
-          SIGNING_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        run: ./gradlew publish
       - name: Stop Gradle
         run: ./gradlew --stop
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
           name: '${{ steps.mod_data.outputs.mod_version }}+${{ steps.mod_data.outputs.minecraft_version }}'
-          artifacts: "${{ steps.artifacts.outputs.fabric }},${{ steps.artifacts.outputs.fabric }}.asc,${{ steps.artifacts.outputs.neoforge }},${{ steps.artifacts.outputs.neoforge }}.asc,CHANGELOG.txt"
+          artifacts: "${{ steps.artifacts.outputs.fabric }},${{ steps.artifacts.outputs.neoforge }},CHANGELOG.txt"
           bodyFile: "RELEASE_BODY.md"
       - name: Prepare Artifacts
         run: |
           mkdir artifacts
-          mv ${{ steps.artifacts.outputs.neoforge }} artifacts
-          mv ${{ steps.artifacts.outputs.neoforge }}.asc artifacts
-          mv ${{ steps.artifacts.outputs.fabric }} artifacts
-          mv ${{ steps.artifacts.outputs.fabric }}.asc artifacts
+          mv ${{ steps.artifacts.outputs.neoforge }} artifacts/
+          mv ${{ steps.artifacts.outputs.fabric }} artifacts/
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
