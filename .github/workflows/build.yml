@@ -1,4 +1,4 @@
-name: Build Backpacked
+Name: Build Backpacked
 on:
   push:
     tags:
@@ -108,8 +108,8 @@ jobs:
       - name: Construct artifact files
         id: artifacts
         run: |
-          fabric_file=$(ls fabric/build/libs/${{ steps.mod_data.outputs.mod_id }}-fabric-${{ steps.mod_data.outputs.mod_version }}+${{ steps.mod_data.outputs.minecraft_version }}*.jar | head -n 1)
-          neoforge_file=$(ls neoforge/build/libs/${{ steps.mod_data.outputs.mod_id }}-neoforge-${{ steps.mod_data.outputs.mod_version }}+${{ steps.mod_data.outputs.minecraft_version }}*.jar | head -n 1)
+          fabric_file=$(find fabric/build/libs -maxdepth 1 -name "*.jar" ! -name "*-sources.jar" ! -name "*-javadoc.jar" | head -n 1)
+          neoforge_file=$(find neoforge/build/libs -maxdepth 1 -name "*.jar" ! -name "*-sources.jar" ! -name "*-javadoc.jar" | head -n 1)
           echo "fabric=$fabric_file" >> "$GITHUB_OUTPUT"
           echo "neoforge=$neoforge_file" >> "$GITHUB_OUTPUT"
       - name: Create Changelog Files
@@ -137,7 +137,6 @@ jobs:
           name: '${{ steps.mod_data.outputs.mod_version }}+${{ steps.mod_data.outputs.minecraft_version }}'
           artifacts: "${{ steps.artifacts.outputs.fabric }},${{ steps.artifacts.outputs.neoforge }},CHANGELOG.txt"
           bodyFile: "RELEASE_BODY.md"
-
       - name: Prepare Artifacts
         run: |
           mkdir artifacts
